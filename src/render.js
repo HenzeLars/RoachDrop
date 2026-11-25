@@ -1,5 +1,5 @@
 // Canvas 2D renderer. Pure drawing — reads game state, never mutates it. 🪳
-import { COLS, ROWS, HIDDEN, TOTAL_ROWS, COLORS, PIECE_COLORS } from './constants.js';
+import { COLS, ROWS, HIDDEN, TOTAL_ROWS, COLORS, PIECE_COLORS, GLOW_LEVELS } from './constants.js';
 import { SHAPES } from './pieces.js';
 
 export class Renderer {
@@ -10,7 +10,12 @@ export class Renderer {
     this.shake = 0;
     this.strobe = 0;
     this.particles = [];
+    this.glow = GLOW_LEVELS.full; // current glow preset
     this._resize();
+  }
+
+  setGlow(level) {
+    this.glow = GLOW_LEVELS[level] || GLOW_LEVELS.full;
   }
 
   _resize() {
@@ -56,12 +61,23 @@ export class Renderer {
       c.fillStyle = color;
       c.fillRect(px + 2, py + 2, s - 4, s - 4);
     } else {
+      c.globalAlpha = alpha * this.glow.fill;
       c.shadowColor = color;
-      c.shadowBlur = 12;
+      c.shadowBlur = this.glow.block;
       c.fillStyle = color;
       this._roundRect(px + 1, py + 1, s - 2, s - 2, 4);
       c.fill();
       c.shadowBlur = 0;
+      // Supernova: white-hot additive core so blocks blow out to blinding.
+      if (this.glow.white) {
+        c.globalCompositeOperation = 'lighter';
+        c.globalAlpha = this.glow.white;
+        c.fillStyle = '#ffffff';
+        this._roundRect(px + 1, py + 1, s - 2, s - 2, 4);
+        c.fill();
+        c.globalCompositeOperation = 'source-over';
+      }
+      c.globalAlpha = alpha;
       // bevel highlight
       c.fillStyle = 'rgba(255,255,255,0.25)';
       this._roundRect(px + 3, py + 3, s - 6, (s - 6) / 2, 3);
@@ -151,11 +167,11 @@ export class Renderer {
     // strobe border on 4-line drop
     if (this.strobe > 0.01) {
       c.save();
-      c.globalAlpha = this.strobe;
+      c.globalAlpha = Math.min(1, this.strobe * this.glow.strobe);
       c.strokeStyle = COLORS.pink;
       c.lineWidth = 6;
       c.shadowColor = COLORS.pink;
-      c.shadowBlur = 30;
+      c.shadowBlur = 30 * this.glow.css;
       c.strokeRect(3, 3, this.w - 6, this.h - 6);
       c.restore();
       this.strobe *= 0.9;

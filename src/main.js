@@ -4,7 +4,7 @@ import { Renderer } from './render.js';
 import { AudioEngine } from './audio.js';
 import { Input } from './input.js';
 import { MASCOT_SVG, setMascotState } from './mascot.js';
-import { PIECE_COLORS, HIDDEN, TOTAL_ROWS, COLS } from './constants.js';
+import { PIECE_COLORS, HIDDEN, TOTAL_ROWS, COLS, GLOW_LEVELS } from './constants.js';
 import { SHAPES, BOX } from './pieces.js';
 
 const $ = (id) => document.getElementById(id);
@@ -14,6 +14,24 @@ const game = new Game();
 const renderer = new Renderer(canvas);
 const audio = new AudioEngine();
 const input = new Input(game, audio);
+
+// --- Glow setting (off / med / full / supernova) ---
+let glowBlock = GLOW_LEVELS.full.block; // used by drawPreview
+function applyGlow(level) {
+  const preset = GLOW_LEVELS[level] || GLOW_LEVELS.full;
+  renderer.setGlow(level);
+  glowBlock = preset.block;
+  // CSS-driven glow (text/box shadows, mascot) scales via --glow.
+  document.documentElement.style.setProperty('--glow', String(preset.css));
+  try { localStorage.setItem('roachdrop.glow', level); } catch {}
+  // Redraw previews with the new glow.
+  drawPreview($('holdCanvas'), game.hold);
+  game.nextQueue.forEach((t, i) => drawPreview($('next' + i), t));
+  lastHud = {};
+}
+// Restore saved glow (default full).
+let savedGlow = 'full';
+try { savedGlow = localStorage.getItem('roachdrop.glow') || 'full'; } catch {}
 
 // Inject mascot
 const mascotWrap = $('mascot');
@@ -34,6 +52,20 @@ $('musicBtn').addEventListener('click', () => {
   $('musicBtn').textContent = audio.musicOn ? '♫ Music On' : '♫ Music Off';
 });
 $('startBtn').addEventListener('click', () => { unlock(); game.start(); audio.startMusic(); });
+
+// Glow buttons
+function reflectGlow() {
+  document.querySelectorAll('[data-glow]').forEach((b) => {
+    b.classList.toggle('active', b.dataset.glow === savedGlow);
+  });
+}
+document.querySelectorAll('[data-glow]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    savedGlow = btn.dataset.glow;
+    applyGlow(savedGlow);
+    reflectGlow();
+  });
+});
 
 function reflectMute() {
   $('muteBtn').textContent = audio.muted ? '🔇 Sound: Off' : '🔊 Sound: On';
@@ -83,7 +115,7 @@ function drawPreview(canvasEl, type) {
     const x = ox + (cx - minX) * s, y = oy + (cy - minY) * s;
     // glow body
     c.shadowColor = PIECE_COLORS[type];
-    c.shadowBlur = 10;
+    c.shadowBlur = glowBlock;
     c.fillStyle = PIECE_COLORS[type];
     _rr(c, x + 1, y + 1, s - 2, s - 2, r);
     c.fill();
@@ -233,6 +265,10 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+// Apply saved glow + reflect button state on load.
+applyGlow(savedGlow);
+reflectGlow();
 
 // Resize
 window.addEventListener('resize', () => renderer._resize());

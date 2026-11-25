@@ -42,3 +42,14 @@ export const PIECE_COLORS = {
   T: '#b026ff',
   Z: '#ff2a85',
 };
+
+// Glow intensity presets. `block` scales the canvas block glow (shadowBlur),
+// `fill` dims/brightens the block body, `css` scales CSS glow via --glow,
+// `strobe` scales the 4-line strobe. Full == the original look.
+// Supernova is deliberately, irresponsibly bright. You have been warned. ☀️
+export const GLOW_LEVELS = {
+  off:       { block: 0,  fill: 0.78, css: 0,   strobe: 0.3 },
+  med:       { block: 5,  fill: 0.9,  css: 0.5, strobe: 0.6 },
+  full:      { block: 12, fill: 1,    css: 1,   strobe: 1 },
+  supernova: { block: 60, fill: 1,    css: 3,   strobe: 2.5, white: 0.55 },
+};
