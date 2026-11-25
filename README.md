@@ -5,7 +5,7 @@ Vanilla ES modules, HTML5 Canvas 2D, and the Web Audio API — no frameworks, no
 
 ## Play
 
-- **Online (GitHub Pages):** https://<your-username>.github.io/RoachDrop/
+- **Online (GitHub Pages):** https://henzelars.github.io/RoachDrop/
 - **Locally:** it's a static site, so serve the repo root with any static server, e.g.
   `python3 -m http.server 8042` then open http://localhost:8042/
   (Opening `index.html` directly via `file://` won't work — browsers block ES modules there.)
