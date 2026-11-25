@@ -1,5 +1,8 @@
 # Deploy RoachDrop to GitHub Pages on push to main.
 # One-time setup: repo Settings → Pages → Source: "GitHub Actions".
+#
+# Split into two jobs (build → deploy) to avoid actions/deploy-pages issue #451,
+# where deploy-pages in the SAME job races the artifact upload and finds 0 artifacts.
 name: Deploy to GitHub Pages
 
 on:
@@ -9,8 +12,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Allow one concurrent deployment, cancel in-progress runs.
 concurrency:
@@ -18,11 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -33,6 +31,17 @@ jobs:
         with:
           # Serve the whole repo root as-is (static site, no build step).
           path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
