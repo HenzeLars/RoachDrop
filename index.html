@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoachDrop 🪳</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪳</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>🪳 RoachDrop</h1>
+      <div class="topbar-right">
+        <span class="bpm" id="bpm">160 BPM</span>
+        <span class="build" id="build">build 14</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- Left panel -->
+      <aside class="panel left">
+        <section class="box">
+          <h2>Hold <span class="key">C</span></h2>
+          <canvas id="holdCanvas" width="120" height="90"></canvas>
+        </section>
+        <section class="box controls">
+          <h2>Controls</h2>
+          <ul>
+            <li><span>Move</span><span class="key">← → / A D</span></li>
+            <li><span>Soft Drop</span><span class="key">↓ / S</span></li>
+            <li><span>Hard Drop</span><span class="key">Space</span></li>
+            <li><span>Rotate CW</span><span class="key">↑ / X</span></li>
+            <li><span>Rotate CCW</span><span class="key">Z / Ctrl</span></li>
+            <li><span>Hold</span><span class="key">C / Shift</span></li>
+            <li><span>Pause</span><span class="key">P / Esc</span></li>
+            <li><span>Mute</span><span class="key">M</span></li>
+          </ul>
+        </section>
+        <section class="box audio-box">
+          <button id="muteBtn">🔊 Sound</button>
+          <button id="musicBtn">♫ Music On</button>
+        </section>
+      </aside>
+
+      <!-- Center board -->
+      <section class="center">
+        <div class="board-wrap">
+          <canvas id="board"></canvas>
+          <div id="callout" class="callout">MASSIVE DROP! 🪳</div>
+          <div id="overlay" class="overlay">
+            <div class="overlay-inner">
+              <div id="overlayTitle" class="overlay-title">🪳 RoachDrop</div>
+              <div id="overlayText" class="overlay-text">Press Enter / Space to start</div>
+              <button id="startBtn" class="start-btn">Start 🪳</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right panel -->
+      <aside class="panel right">
+        <section class="box">
+          <h2>Next</h2>
+          <div class="next-row"><canvas id="next0" width="120" height="70"></canvas></div>
+          <div class="next-row"><canvas id="next1" width="120" height="70"></canvas></div>
+          <div class="next-row"><canvas id="next2" width="120" height="70"></canvas></div>
+        </section>
+        <section class="box stats">
+          <div class="stat"><span>Score</span><span id="score">0</span></div>
+          <div class="stat"><span>High</span><span id="high">0</span></div>
+          <div class="stat"><span>Lines</span><span id="lines">0</span></div>
+          <div class="stat"><span>Level</span><span id="level">1</span></div>
+          <div class="stat combo-stat"><span>Combo</span><span id="combo"></span></div>
+        </section>
+        <section class="box mascot-box">
+          <div id="mascot" class="mascot" data-state="idle"></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script type="module" src="src/main.js?v=14"></script>
+</body>
+</html>
